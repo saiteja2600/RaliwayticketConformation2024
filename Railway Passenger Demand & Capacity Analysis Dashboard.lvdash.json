@@ -1,0 +1,1079 @@
+{
+  "datasets": [
+    {
+      "name": "18a0f4b5",
+      "displayName": "Long Distance Confirmed General Quota Train Bookings Dataset",
+      "queryLines": [
+        "SELECT\r\n",
+        "   rfc.Train_Number,rfc.Class_of_Travel, rfc.Date_of_Journey,rfc.Number_of_Passengers,rfc.Source_Station,rfc.Destination_Station,rfc.Booking_Date\r\n",
+        "    \r\n",
+        "FROM railway_ticket_confirmation rfc\r\n",
+        "WHERE rfc.Quota = 'General'\r\n",
+        "  AND rfc.Travel_Distance > 1000 and rfc.Confirmation_Status = 'Confirmed'\r\n",
+        "GROUP BY rfc.Date_of_Journey, rfc.Train_Number, rfc.Number_of_Passengers,rfc.Source_Station,rfc.Destination_Station,rfc.Booking_Date,rfc.Class_of_Travel\r\n",
+        "ORDER BY rfc.Date_of_Journey;\r\n"
+      ],
+      "catalog": "datastore2026",
+      "schema": "railwayticket2024"
+    },
+    {
+      "name": "21a54070",
+      "displayName": "Long Distance Train Journey Booking Records",
+      "queryLines": [
+        "SELECT DISTINCT\r\n",
+        "    rfc.Train_Number,\r\n",
+        "    rfc.Date_of_Journey,\r\n",
+        "    rfc.Booking_Date,\r\n",
+        "    rfc.Source_Station,\r\n",
+        "    rfc.Destination_Station,\r\n",
+        "    rfc.Travel_Distance,\r\n",
+        "    rfc.Class_of_Travel,\r\n",
+        "    rfc.Age_of_Passengers,\r\n",
+        "    rfc.Booking_Channel\r\n",
+        "FROM railway_ticket_confirmation rfc\r\n",
+        "WHERE year(rfc.Date_of_Journey) BETWEEN 2024 AND year(current_date()) and month(rfc.Date_of_Journey) BETWEEN 1 AND month(current_date())\r\n",
+        "  AND rfc.Travel_Distance > 1000\r\n",
+        "ORDER BY rfc.Date_of_Journey DESC;\r\n"
+      ],
+      "catalog": "datastore2026",
+      "schema": "railwayticket2024"
+    },
+    {
+      "name": "f68756e4",
+      "displayName": "Railway Passenger Traffic Summary Between Medium Distances",
+      "queryLines": [
+        "SELECT\r\n",
+        "DISTINCT\r\n",
+        " rtc.Train_Type,\r\n",
+        "  rtc.Source_Station,\r\n",
+        "  rtc.Destination_Station,\r\n",
+        " rtc.Number_of_Stations,\r\n",
+        " rtc.Travel_Distance,\r\n",
+        "  COUNT(Train_Number) AS trains_count,\r\n",
+        "  SUM(Number_of_Passengers) AS total_passengers\r\n",
+        "FROM railway_ticket_confirmation rtc\r\n",
+        "WHERE rtc.Travel_Distance BETWEEN 500 and 1000\r\n",
+        "GROUP BY rtc.Source_Station, rtc.Destination_Station, rtc.Train_Type,rtc.Number_of_Stations,rtc.Travel_Distance\r\n",
+        "ORDER BY total_passengers DESC;\r\n"
+      ],
+      "catalog": "datastore2026",
+      "schema": "railwayticket2024"
+    },
+    {
+      "name": "e54d54d0",
+      "displayName": "railway passenger flow analysis between medium distances",
+      "queryLines": [
+        "SELECT\r\n",
+        "  Source_Station,\r\n",
+        "  Destination_Station,\r\n",
+        "  ROUND(SUM(Number_of_Passengers) / AVG(Number_of_Stations), 2) AS passengers_per_station\r\n",
+        "FROM railway_ticket_confirmation\r\n",
+        "WHERE Travel_Distance BETWEEN 500 AND 1000\r\n",
+        "GROUP BY Source_Station, Destination_Station\r\n",
+        "ORDER BY passengers_per_station DESC;\r\n"
+      ],
+      "catalog": "datastore2026",
+      "schema": "railwayticket2024"
+    },
+    {
+      "name": "4e310e04",
+      "displayName": "Total Railway Passenger Count Summary",
+      "queryLines": [
+        "SELECT\r\n",
+        "  SUM(rtc.Number_of_Passengers) AS total_passengers\r\n",
+        "FROM railway_ticket_confirmation rtc\r\n",
+        "WHERE rtc.Booking_Date BETWEEN '2024-01-01' AND '2026-12-31'\r\n"
+      ],
+      "catalog": "datastore2026",
+      "schema": "railwayticket2024"
+    },
+    {
+      "name": "90430c12",
+      "displayName": "Unique Train Counts from Railway Ticket Data",
+      "queryLines": [
+        "SELECT\r\n",
+        "  COUNT(DISTINCT rtc.Train_Number) AS total_bookings\r\n",
+        "FROM railway_ticket_confirmation rtc\r\n",
+        "WHERE rtc.Booking_Date BETWEEN '2024-01-01' AND '2026-12-31'"
+      ],
+      "catalog": "datastore2026",
+      "schema": "railwayticket2024"
+    },
+    {
+      "name": "d6f7395a",
+      "displayName": "average passengers per train journey summary",
+      "queryLines": [
+        "SELECT\r\n",
+        "  ROUND(\r\n",
+        "    SUM(rtc.Number_of_Passengers) * 1.0 / COUNT(DISTINCT rtc.Train_Number),\r\n",
+        "    2\r\n",
+        "  ) AS avg_passengers_per_train\r\n",
+        "FROM railway_ticket_confirmation rtc\r\n",
+        "WHERE rtc.Booking_Date BETWEEN '2024-01-01' AND '2026-12-31'"
+      ],
+      "catalog": "datastore2026",
+      "schema": "railwayticket2024"
+    },
+    {
+      "name": "3a688c52",
+      "displayName": "Train With Highest Passenger Count Summary",
+      "queryLines": [
+        "SELECT\r\n",
+        "  Train_Number,\r\n",
+        "  SUM(Number_of_Passengers) AS total_passengers\r\n",
+        "FROM railway_ticket_confirmation\r\n",
+        "GROUP BY Train_Number\r\n",
+        "ORDER BY total_passengers DESC\r\n",
+        "LIMIT 1;\r\n"
+      ],
+      "catalog": "datastore2026",
+      "schema": "railwayticket2024"
+    },
+    {
+      "name": "835a9a49",
+      "displayName": "Passenger Share Distribution by Travel Class",
+      "queryLines": [
+        "SELECT\r\n",
+        "  Class_of_Travel,\r\n",
+        "  CONCAT(\r\n",
+        "    ROUND(\r\n",
+        "      SUM(Number_of_Passengers) * 100.0 /\r\n",
+        "      SUM(SUM(Number_of_Passengers)) OVER (),\r\n",
+        "      2\r\n",
+        "    ),\r\n",
+        "    '%'\r\n",
+        "  ) AS passenger_percentage\r\n",
+        "FROM railway_ticket_confirmation\r\n",
+        "GROUP BY Class_of_Travel;\r\n"
+      ],
+      "catalog": "datastore2026",
+      "schema": "railwayticket2024"
+    },
+    {
+      "name": "51c1dd96",
+      "displayName": "Railway Route Performance and Passenger Demand Summary",
+      "queryLines": [
+        "WITH route_metrics AS (\r\n",
+        "  SELECT\r\n",
+        "  Train_Number,\r\n",
+        "    Source_Station,\r\n",
+        "    Destination_Station,\r\n",
+        "    Train_Type,\r\n",
+        "    ROUND(AVG(Travel_Distance), 0) AS travel_distance_km,\r\n",
+        "    ROUND(AVG(Number_of_Stations), 0) AS number_of_stations,\r\n",
+        "    SUM(Number_of_Passengers) AS total_passengers,\r\n",
+        "    ROUND(\r\n",
+        "      AVG(Travel_Distance) / NULLIF(AVG(Number_of_Stations), 0), 2\r\n",
+        "    ) AS efficiency_score  -- distance per station (higher = faster/fewer stops)\r\n",
+        "  FROM railway_ticket_confirmation\r\n",
+        "  WHERE YEAR(Date_of_Journey) BETWEEN 2024 AND 2025\r\n",
+        "  GROUP BY\r\n",
+        "  Train_Number,\r\n",
+        "    Source_Station,\r\n",
+        "    Destination_Station,\r\n",
+        "    Train_Type\r\n",
+        ")\r\n",
+        "\r\n",
+        "SELECT *,\r\n",
+        "  CASE\r\n",
+        "    WHEN efficiency_score >= 50 THEN 'High Demand'\r\n",
+        "    ELSE 'Low Demand'\r\n",
+        "  END AS efficiency_level\r\n",
+        "FROM route_metrics\r\n",
+        "ORDER BY efficiency_score DESC;\r\n"
+      ],
+      "catalog": "datastore2026",
+      "schema": "railwayticket2024"
+    },
+    {
+      "name": "7fa81986",
+      "displayName": "Passenger Counts by Distance and Booking Channel",
+      "queryLines": [
+        "SELECT\r\n",
+        "  'Distance Band' AS metric_type,\r\n",
+        "  CASE\r\n",
+        "    WHEN Travel_Distance < 500 THEN '< 500 km'\r\n",
+        "    WHEN Travel_Distance BETWEEN 500 AND 1000 THEN '500–1000 km'\r\n",
+        "    ELSE '> 1000 km'\r\n",
+        "  END AS category,\r\n",
+        "  SUM(Number_of_Passengers) AS total_passengers\r\n",
+        "FROM railway_ticket_confirmation\r\n",
+        "GROUP BY\r\n",
+        "  CASE\r\n",
+        "    WHEN Travel_Distance < 500 THEN '< 500 km'\r\n",
+        "    WHEN Travel_Distance BETWEEN 500 AND 1000 THEN '500–1000 km'\r\n",
+        "    ELSE '> 1000 km'\r\n",
+        "  END\r\n",
+        "\r\n",
+        "UNION ALL\r\n",
+        "\r\n",
+        "SELECT\r\n",
+        "  'Booking Channel' AS metric_type,\r\n",
+        "  Booking_Channel AS category,\r\n",
+        "  SUM(Number_of_Passengers) AS total_passengers\r\n",
+        "FROM railway_ticket_confirmation\r\n",
+        "GROUP BY Booking_Channel;\r\n"
+      ],
+      "catalog": "datastore2026",
+      "schema": "railwayticket2024"
+    },
+    {
+      "name": "be317b7a",
+      "displayName": "Train Schedule Data Overview",
+      "queryLines": [
+        "WITH train_level_summary AS (\r\n",
+        "  SELECT\r\n",
+        "    rtc.Train_Number,\r\n",
+        "    rtc.Train_Type,\r\n",
+        "    rtc.Source_Station,\r\n",
+        "    rtc.Destination_Station,\r\n",
+        "\r\n",
+        "    collect_set(rtc.Class_of_Travel) AS class_of_travel_array,\r\n",
+        "\r\n",
+        "    COUNT(DISTINCT rtc.PNR_Number) AS total_bookings,\r\n",
+        "    SUM(rtc.Number_of_Passengers) AS total_passengers\r\n",
+        "  FROM railway_ticket_confirmation rtc\r\n",
+        "  WHERE rtc.Booking_Date BETWEEN '2024-01-01' AND '2026-12-31'\r\n",
+        "    AND rtc.Confirmation_Status IN ('Confirmed', 'RAC')\r\n",
+        "  GROUP BY\r\n",
+        "    rtc.Train_Number,\r\n",
+        "    rtc.Train_Type,\r\n",
+        "    rtc.Source_Station,\r\n",
+        "    rtc.Destination_Station\r\n",
+        ")\r\n",
+        "\r\n",
+        "SELECT *\r\n",
+        "FROM train_level_summary\r\n",
+        "ORDER BY total_passengers DESC;\r\n"
+      ],
+      "catalog": "datastore2026",
+      "schema": "railwayticket2024"
+    },
+    {
+      "name": "44e6d71d",
+      "displayName": "Train Route Performance and Booking Overview",
+      "queryLines": [
+        "WITH route_metrics AS (\r\n",
+        "  SELECT\r\n",
+        "    Train_Number,\r\n",
+        "    Source_Station,\r\n",
+        "    Destination_Station,\r\n",
+        "    Train_Type,\r\n",
+        "    ROUND(AVG(Travel_Distance), 0) AS travel_distance_km,\r\n",
+        "    ROUND(AVG(Number_of_Stations), 0) AS number_of_stations,\r\n",
+        "    SUM(Number_of_Passengers) AS total_passengers_route,\r\n",
+        "    ROUND(\r\n",
+        "      AVG(Travel_Distance) / NULLIF(AVG(Number_of_Stations), 0), 2\r\n",
+        "    ) AS efficiency_score\r\n",
+        "  FROM railway_ticket_confirmation\r\n",
+        "  WHERE YEAR(Date_of_Journey) BETWEEN 2024 AND 2026\r\n",
+        "  GROUP BY\r\n",
+        "    Train_Number,\r\n",
+        "    Source_Station,\r\n",
+        "    Destination_Station,\r\n",
+        "    Train_Type\r\n",
+        "),\r\n",
+        "\r\n",
+        "train_level_summary AS (\r\n",
+        "  SELECT\r\n",
+        "    rtc.Train_Number,\r\n",
+        "    rtc.Train_Type,\r\n",
+        "    rtc.Source_Station,\r\n",
+        "    rtc.Destination_Station,\r\n",
+        "    collect_set(rtc.Class_of_Travel) AS class_of_travel_array,\r\n",
+        "    COUNT(DISTINCT rtc.PNR_Number) AS total_bookings,\r\n",
+        "    SUM(rtc.Number_of_Passengers) AS total_passengers_booked\r\n",
+        "  FROM railway_ticket_confirmation rtc\r\n",
+        "  WHERE rtc.Booking_Date BETWEEN '2024-01-01' AND '2026-12-31'\r\n",
+        "    AND rtc.Confirmation_Status IN ('Confirmed', 'RAC')\r\n",
+        "  GROUP BY\r\n",
+        "    rtc.Train_Number,\r\n",
+        "    rtc.Train_Type,\r\n",
+        "    rtc.Source_Station,\r\n",
+        "    rtc.Destination_Station\r\n",
+        ")\r\n",
+        "\r\n",
+        "SELECT \r\n",
+        "  rm.Train_Number,\r\n",
+        "  rm.Train_Type,\r\n",
+        "  rm.Source_Station,\r\n",
+        "  rm.Destination_Station,\r\n",
+        "  COALESCE(rm.travel_distance_km, 0) AS travel_distance_km,\r\n",
+        "  COALESCE(rm.number_of_stations, 0) AS number_of_stations,\r\n",
+        "  COALESCE(rm.total_passengers_route, 0) AS total_passengers_route,\r\n",
+        "  COALESCE(rm.efficiency_score, 0) AS efficiency_score,\r\n",
+        "  CASE\r\n",
+        "    WHEN COALESCE(rm.efficiency_score, 0) >= 50 THEN 'High Demand'\r\n",
+        "    ELSE 'Low Demand'\r\n",
+        "  END AS efficiency_level,\r\n",
+        "  COALESCE(tls.total_bookings, 0) AS total_bookings,\r\n",
+        "  COALESCE(tls.total_passengers_booked, 0) AS total_passengers_booked\r\n",
+        "FROM route_metrics rm\r\n",
+        "LEFT JOIN train_level_summary tls\r\n",
+        "  ON rm.Train_Number = tls.Train_Number\r\n",
+        "  AND rm.Train_Type = tls.Train_Type\r\n",
+        "  AND rm.Source_Station = tls.Source_Station\r\n",
+        "  AND rm.Destination_Station = tls.Destination_Station\r\n",
+        "ORDER BY rm.efficiency_score DESC;\r\n"
+      ],
+      "catalog": "datastore2026",
+      "schema": "railwayticket2024"
+    }
+  ],
+  "pages": [
+    {
+      "name": "54cb3165",
+      "displayName": "Railway Passenger Demand & Capacity Analysis Dashboard",
+      "layout": [
+        {
+          "widget": {
+            "name": "4569340d",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# <span style=\"text-align:center;display:block;\"><span style=\"font-family: Courier New;\">**Railway Passenger Demand & Capacity Analysis Dashboard**</span></span>"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "total-train-count",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "90430c12",
+                  "fields": [
+                    {
+                      "name": "sum(total_bookings)",
+                      "expression": "SUM(`total_bookings`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(total_bookings)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "all"
+                    },
+                    "significantFigures": {
+                      "type": "max",
+                      "figures": 3
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "title": "Total Bookings",
+                "showTitle": true,
+                "headerAlignment": "center"
+              }
+            },
+            "specExtensions": {
+              "widgetBackgroundColor": {
+                "dark": "#14B8A6"
+              },
+              "widgetBorderColor": {
+                "dark": "#1F2933"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "total-passengers",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "4e310e04",
+                  "fields": [
+                    {
+                      "name": "sum(total_passengers)",
+                      "expression": "SUM(`total_passengers`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(total_passengers)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "all"
+                    },
+                    "significantFigures": {
+                      "type": "all"
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "title": "Total Passengers",
+                "showTitle": true,
+                "headerAlignment": "center"
+              }
+            },
+            "specExtensions": {
+              "widgetBackgroundColor": {
+                "dark": "#3B82F6"
+              },
+              "widgetBorderColor": {
+                "dark": "#1F2933"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 2,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "average-passengers-per-train",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d6f7395a",
+                  "fields": [
+                    {
+                      "name": "avg(avg_passengers_per_train)",
+                      "expression": "AVG(`avg_passengers_per_train`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(avg_passengers_per_train)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "all"
+                    },
+                    "significantFigures": {
+                      "type": "all"
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "title": "Average Passengers per Train",
+                "showTitle": true,
+                "headerAlignment": "center"
+              }
+            },
+            "specExtensions": {
+              "widgetBackgroundColor": {
+                "dark": "#F59E0B"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "passengers-travelled-by-distance",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "7fa81986",
+                  "fields": [
+                    {
+                      "name": "category",
+                      "expression": "`category`"
+                    },
+                    {
+                      "name": "metric_type",
+                      "expression": "`metric_type`"
+                    },
+                    {
+                      "name": "total_passengers",
+                      "expression": "`total_passengers`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "metric_type",
+                  "displayName": "Category",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "total_passengers",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "category",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Passengers Travelled By Distance",
+                "headerAlignment": "center"
+              }
+            },
+            "specExtensions": {
+              "widgetBackgroundColor": {
+                "dark": "#2A4855"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 4,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "class-wise-utilization",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "835a9a49",
+                  "fields": [
+                    {
+                      "name": "countdistinct(passenger_percentage)",
+                      "expression": "COUNT(DISTINCT `passenger_percentage`)"
+                    },
+                    {
+                      "name": "Class_of_Travel",
+                      "expression": "`Class_of_Travel`"
+                    },
+                    {
+                      "name": "passenger_percentage",
+                      "expression": "`passenger_percentage`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "countdistinct(passenger_percentage)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "axis": {
+                    "hideTitle": true
+                  }
+                },
+                "color": {
+                  "fieldName": "Class_of_Travel",
+                  "legend": {
+                    "position": "bottom",
+                    "hide": false
+                  },
+                  "displayName": "Class Of Travel",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "natural-order"
+                    }
+                  }
+                },
+                "label": {
+                  "show": true,
+                  "text": {
+                    "fieldName": "passenger_percentage"
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Class-wise Utilization",
+                "headerAlignment": "center"
+              }
+            },
+            "specExtensions": {
+              "widgetBackgroundColor": {
+                "dark": "#1C1E26"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 4,
+            "width": 2,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "train-route-demand-performance-summary",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "44e6d71d",
+                  "fields": [
+                    {
+                      "name": "Train_Number",
+                      "expression": "`Train_Number`"
+                    },
+                    {
+                      "name": "Train_Type",
+                      "expression": "`Train_Type`"
+                    },
+                    {
+                      "name": "Source_Station",
+                      "expression": "`Source_Station`"
+                    },
+                    {
+                      "name": "Destination_Station",
+                      "expression": "`Destination_Station`"
+                    },
+                    {
+                      "name": "travel_distance_km",
+                      "expression": "`travel_distance_km`"
+                    },
+                    {
+                      "name": "number_of_stations",
+                      "expression": "`number_of_stations`"
+                    },
+                    {
+                      "name": "efficiency_score",
+                      "expression": "`efficiency_score`"
+                    },
+                    {
+                      "name": "total_passengers_booked",
+                      "expression": "`total_passengers_booked`"
+                    },
+                    {
+                      "name": "efficiency_level",
+                      "expression": "`efficiency_level`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "Train_Number",
+                    "numberFormat": "0",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "integer",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 0,
+                    "title": "Train Number",
+                    "allowSearch": true,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "Train_Type",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 1,
+                    "title": "Train Name",
+                    "allowSearch": true,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "Source_Station",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 2,
+                    "title": "Source Station",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "Destination_Station",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 3,
+                    "title": "Destination Station",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "travel_distance_km",
+                    "numberFormat": "0",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "float",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 4,
+                    "title": "Travel Distance (Km)",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "number_of_stations",
+                    "numberFormat": "0",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "float",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 5,
+                    "title": "Number Of Stations",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "efficiency_score",
+                    "numberFormat": "0.00",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "float",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 7,
+                    "title": "efficiency_score",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "total_passengers_booked",
+                    "numberFormat": "0",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "integer",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 9,
+                    "title": "Total Passengers Booked",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "efficiency_level",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 10,
+                    "title": "Efficiency Level",
+                    "allowSearch": true,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "defaultColumnWidth": 2
+                  }
+                ]
+              },
+              "invisibleColumns": [
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "total_passengers_route",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 6,
+                  "title": "Total Passengers Route",
+                  "allowSearch": false,
+                  "alignContent": "left",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "total_bookings",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 8,
+                  "title": "total_bookings",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                }
+              ],
+              "allowHTMLByDefault": false,
+              "itemsPerPage": 10,
+              "paginationSize": "default",
+              "condensed": false,
+              "withRowNumber": false,
+              "firstNFrozenColumns": 0,
+              "frame": {
+                "showTitle": true,
+                "title": "Train Route Demand & Performance Summary"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 6,
+            "height": 9
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "canvasBackgroundColor": {
+        "light": "#FAFAFB",
+        "dark": "#0E1117"
+      },
+      "widgetBackgroundColor": {
+        "light": "#FFFFFF",
+        "dark": "#11171C"
+      },
+      "widgetBorderColor": {
+        "dark": "#1F2933"
+      },
+      "fontColor": {
+        "light": "#11171C",
+        "dark": "#E2DDDD"
+      },
+      "selectionColor": {
+        "light": "#2272B4",
+        "dark": "#8ACAFF"
+      },
+      "visualizationColors": [
+        "#077A9D",
+        "#FFAB00",
+        "#00A972",
+        "#FF3621",
+        "#8BCAE7",
+        "#AB4057",
+        "#99DDB4",
+        "#FCA4A1",
+        "#919191",
+        "#BF7080"
+      ],
+      "widgetHeaderAlignment": "CENTER",
+      "fontFamily": "Georgia"
+    },
+    "applyModeEnabled": false
+  }
+}
